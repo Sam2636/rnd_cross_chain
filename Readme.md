@@ -8,3 +8,5 @@ packages used in cross_chain
 1.web3
 2.streamlit 
 3.request
+
+run command ----> "streamlit run rnd_cross_chain"
