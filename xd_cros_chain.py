@@ -1,3 +1,6 @@
+#cross chain code 
+#use your own ethereum node ----> infura or other node providers
+
 import streamlit as st
 from web3 import Web3
 import requests
