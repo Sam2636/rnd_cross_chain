@@ -1,0 +1,185 @@
+import requests,json,time
+from requests.adapters import HTTPAdapter
+import time
+from selenium import webdriver
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+import pymongo
+import re
+import sys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException
+from webdriver_manager.chrome import ChromeDriverManager
+import pyperclip as pc
+
+
+#db setting
+client =pymongo.MongoClient('mongodb+srv://prabhat:aiotylabs2020!@cluster0.qgqw9.mongodb.net/test')
+my_db=client['nftgdp_coll']
+mycol = my_db["nft_links_new_collection_21"]
+
+
+#static_col="https://collections.rarity.tools/static/collections.json"
+#res = requests.get(static_col)
+#data = res.json()
+
+#print(data["collections"][0])
+collz=['boredapeyachtclub', 'mutant-ape-yacht-club', 'meebits', 'lootproject', 'cool-cats-nft',
+ 'cryptoadz-by-gremplin', '0n1-force', 'mekaverse', 'pudgypenguins', 'bored-ape-kennel-club', 'cyberkongz', 'hashmasks',
+  'veefriends', 'world-of-women-nft', 'the-doge-pound', 'lazy-lions', 'sneaky-vampire-syndicate', 'cyberkongz-vx',
+   'fluf-world', 'collectvox',  'supducks', 'jungle-freaks-by-trosley', 'galacticapes', 
+    'mutantcats', 'rumble-kong-league', 'galaxyeggs9999', 'koala-intelligence-agency',
+     'collectvoxmirandus', 'adam-bomb-squad', 'the-sevens-official', 'thehumanoids', 'peaceful-groupies', 'robotos-official',
+      'thecryptodads', 'deadfellaz', 'theshiboshis', 'desperate-ape-wives', 'akc', 'animetas', 'thewickedcraniums', 'g-evols',
+       'gamblingapes', 'winterbears', 'fvck-crystal', 'vogu','cryptopunks','axie','guttercatgang','bears-deluxe',  'acclimatedmooncats']
+len_tot_col=len(collz)
+
+#for eci in range (0,len_tot_col):
+driver = webdriver.Chrome(ChromeDriverManager().install())
+
+for eci in range (25,50):
+    print(eci)
+    #print(collz[eci])
+    #print("--------")
+
+
+    slumm=collz[eci]
+    info=my_db["{}".format(collz[eci])]
+
+    static_col_tkn="https://projects.rarity.tools/static/staticdata/"+collz[eci]+".json"
+    collzdtkn = requests.get(static_col_tkn).json()
+    print(len(collzdtkn["items"]))
+    len_tot_coltkn=len(collzdtkn["items"])
+    for ectkni in range (0,len_tot_coltkn):      #replace 1 with len_tot_coltkn
+        while True:
+            try:
+                print(collz[eci],"--->",ectkni)
+                tkn=collzdtkn["items"][ectkni]
+                link="https://rarity.tools/"+collz[eci]+"/view/"+tkn[0]
+                #print(link)
+                #tot_no_token=len(tkn)
+                #for trts_no in range (1,tot_no_token):
+                #    print(tkn[trts_no],end=",")
+                #print(" ")
+                
+                
+                #copy code
+                        
+                # for driver we can download and specifiy the path or we can use the below code  
+                
+                driver.get(link)
+                #driver.get("https://rarity.tools/nifty-island-legendary-pistols/view/1")
+                #driver.get("https://rarity.tools/thedudes")
+                
+                
+                
+                
+                driver.maximize_window()
+                driver.delete_all_cookies()
+                driver.refresh()
+                
+                time.sleep(20)
+                
+                driver.implicitly_wait(2)
+                
+                
+                elem = driver.find_element_by_xpath("//*")
+                source_code = elem.get_attribute("outerHTML")
+                #source_code_in = elem.get_attribute("innerHTML")
+                
+                
+                #sa = re.sub(r"\s+", "", source_code, flags=re.UNICODE)
+                #print(sa)
+                #dc="xweeee"
+                
+                """ f = open("nxt.txt", "a")
+                f.write(source_code)
+                f.close()
+                """
+                source_code=source_code.split("absolute top-0 z-10 w-screen h-full lg:h-screen")[1]
+                
+                #print(coutntt)
+                l=source_code.split("<div class=\"mb-1\">")
+                #l[1]
+                sdff=re.compile(r'class="px-2 mx-1 mb-0 text-lg font-extrabold text-green-500 bg-white rounded-md dark:bg-gray-800">\s*(.*?)\s*</div>').findall(l[0])[0]
+                #print("Rarity Score=",sdff)
+                sdff1=re.compile(r'class="font-bold whitespace-nowrap">\s*(.*?)\s*</span>').findall(l[0])[0]
+                
+                rarity_rank=re.sub('[^0-9]', '', sdff1)
+                #print("Rarity Rank=",rarity_rank)
+                sdff2=re.compile(r'<div class="text-lg font-bold text-left text-pink-700 dark:text-gray-300">\s*(.*?)\s*</div>').findall(l[0])[0]
+                #print(sdff2)
+                
+                
+                #pendin
+                #sdff3=re.compile(r'px-3 py-2"><div class="relative overflow-hidden rounded-xl"><img width="512" height="512" src="(.*?)" class="block p-0">').findall(l[0])[0]
+                #print(sdff3)
+                #pendin
+                sdff3=re.compile(r'relative overflow-hidden rounded-xl"(.*?)" class="block p-0">').findall(l[0])[0]
+                sdff3=sdff3.split("\"")[5]
+                #print(sdff3)
+                #sdff3="sdfds"
+                
+                sdff4=re.compile(r'<div class="mx-3 mt-1 mb-3"><a target="_blank" href="https://opensea.io/assets(.*?)" class="flex flex-row').findall(l[0])
+                permaaa_link="https://opensea.io/assets"+str(sdff4[0])
+                #print("perma=",permaaa_link)
+                #print(l[1])
+                
+                sdff5=re.compile(r'<div class="flex-grow text-right"></div> <a href="https://opensea.io/accounts/(.*?)" target="_blank" class="block ml-1').findall(l[0])
+                accc_link="https://opensea.io/accounts/"+sdff5[0]
+                #print(accc_link)
+                
+                
+                #print("mb1",len(l))
+                #print(l[14])
+                
+                trait={}
+                inx=0
+                for lll in l[1::]:
+                    #print("--------><")
+                    #print(lll)
+                    fave =re.compile(r'<div class="flex-grow font-medium">\s*(.*?)\s*<!----></div>')
+                    ethuuuu =re.compile(r'class="ml-2 mr-2 text-green-500">\s*(.*?)\s*</div>')
+                    sdf=re.compile(r'pl-1 text-base text-right text-green-500">\s*(.*?)\s*</div></div> <div class=')
+                    d1=re.compile(r'dark:border-gray-700"><div class="flex-grow overflow-hidden">\s*(.*?)\s*</div>')
+                    d2=re.compile(r'class="w-12 pr-1 m-px ml-1.5 text-right bg-white dark:bg-gray-200 rounded font-medium text-gray-400 dark:text-gray-600">\s*(.*?)\s*</div>')
+                
+                    ze = fave.findall(lll)[0]
+                    zeth = ethuuuu.findall(lll)[0]
+                    
+                    df=sdf.findall(lll)[0]
+                    sd1=d1.findall(lll)[0]
+                    sd2=d2.findall(lll)[0]
+                    
+                    if not (re.search('[a-zA-Z]', zeth)):
+                        zeth='None'
+                    
+                    if "none" in sd1:
+                        sd1='None'
+                    
+                    
+                    
+                    #print(ze,"/././.",zeth,"/././.",df,"/././.",sd1,"/././.",sd2)
+                    
+                    #print("-----")
+                    add_trait = { "trait_type": ze, "trait_eth": zeth,"trait_score": df, "trait_value": sd1, "trait_count": sd2 }
+                    #print(add_trait)
+                    trait[str(inx)]=add_trait
+                    inx=inx+1
+                
+                nft_dict={"nft_name":sdff2, "rarity_rank": rarity_rank, "rarity_score": sdff, "image_url": sdff3, "perma_url": permaaa_link, "acc_owner": accc_link , "traits": trait}
+                #print(nft_dict)
+
+            except:
+                continue
+            #info.insert_one(nft_dict)
+            break
+
+
+                
+                
+        
+driver.close()
