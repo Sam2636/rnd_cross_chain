@@ -58,3 +58,34 @@ console.log('sorting----')
 const fruit = ["Banana", "Orange", "Apple", "Mango"];
 console.log(fruits.sort());
 console.log(fruits.reverse());
+
+
+
+//---------------------------------------------------------->dic
+console.log('------------------------------')
+console.log('adding value to dic----')
+var dict = {};
+dict['sam']='dggh'
+console.log(dict)
+
+console.log('------------------------------')
+console.log('iterating to dic----')
+
+const object = {'a': 1, 'b': 2, 'c' : 3};
+
+for (const [key, value] of Object.entries(object)) {
+  console.log(key, value);
+}
+
+
+myObject ={a:1,b:2,c:3}
+
+//es6
+Object.entries(myObject).forEach(([key, value]) => {
+  console.log('-----',key , value); // key ,value
+});
+
+//es7
+Object.keys(myObject).forEach(key => {
+    console.log(key , myObject[key]) // key , value
+})
